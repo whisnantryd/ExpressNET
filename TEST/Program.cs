@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Debouncehouse.ExpressNET;
 
 namespace TEST
@@ -17,12 +18,6 @@ namespace TEST
             {
                 res.StatusCode = 200;
                 res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss"));
-            });
-
-            baseRoute.GET("*", (req, res) =>
-            {
-                res.StatusCode = 401;
-                res.Send("No auth");
             });
 
             app.Listen("http://*:56000/");

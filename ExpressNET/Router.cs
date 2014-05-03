@@ -83,13 +83,13 @@ namespace Debouncehouse.ExpressNET
                 routelist.AddRange(repo.Where(r => r.Path == str));
             }
 
-            routelist.OrderBy(r => r.SortIndex).ToList().ForEach(r => r.Handler(req, res));
 
-            //var routeForAll = findRepo(method).Where(r => r.Path == allpath).OrderBy(r => r.SortIndex).ToList();
-            //var routeSpecific = findRepo(method).Where(r => r.Path == specpath).OrderBy(r => r.SortIndex).ToList();
+            var matchingRoutes = routelist.OrderBy(r => r.SortIndex).ToList();
 
-            //routeForAll.ForEach(r => r.Handler(req, res));
-            //routeSpecific.ForEach(r => r.Handler(req, res));
+            matchingRoutes.ForEach(r => r.Handler(req, res));
+
+            if (!matchingRoutes.Any())
+                res.StatusCode = 404;
 
             path = null;
             method = null;

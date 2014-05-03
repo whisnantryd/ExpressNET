@@ -38,9 +38,12 @@ namespace Debouncehouse.ExpressNET
             var req = ctx.Request;
             var res = ctx.Response;
 
-            var matchingRoutes = routers.Where(r => req.RawUrl.ToUpper().StartsWith(r.BasePath)).OrderBy(r => r.SortIndex).ToList();
+            var matchingRouters = routers.Where(r => req.RawUrl.ToUpper().StartsWith(r.BasePath)).OrderBy(r => r.SortIndex).ToList();
 
-            matchingRoutes.ForEach(r => r.Process(req, res));
+            matchingRouters.ForEach(r => r.Process(req, res));
+
+            if (!matchingRouters.Any() && !req.RawUrl.Contains("favicon"))
+                res.StatusCode = 500;
 
             res.Close();
         }
