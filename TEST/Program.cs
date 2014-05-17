@@ -16,8 +16,10 @@ namespace TEST
 
             baseRoute.GET("/tod", (req, res) =>
             {
+                var s = req.QueryString["test"];
+
                 res.StatusCode = 200;
-                res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss"));
+                res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
             });
 
             app.Listen("http://*:56000/");

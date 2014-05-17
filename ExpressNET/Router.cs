@@ -1,15 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
-using System.Collections;
 
 namespace Debouncehouse.ExpressNET
 {
 
-    public class Router : IMiddleware
+    public class Router
     {
         const string METHOD_GET = "GET";
         const string METHOD_POST = "POST";
@@ -26,8 +24,6 @@ namespace Debouncehouse.ExpressNET
 
         private List<RouteRepository> Repos { get; set; }
 
-        public DateTime SortIndex { get; private set; }
-
         public Router()
         {
             init("");
@@ -42,7 +38,6 @@ namespace Debouncehouse.ExpressNET
         {
             BasePath = basepath.ToRoute();
             Repos = new List<RouteRepository>();
-            SortIndex = DateTime.Now;
         }
 
         private RouteRepository findRepo(string method)
@@ -69,33 +64,22 @@ namespace Debouncehouse.ExpressNET
             return this;
         }
 
-        #region IMiddleware Members
-
-        public void Process(HttpListenerRequest req, HttpListenerResponse res)
+        public List<Route> FindRoutes(HttpListenerRequest req)
         {
             var method = req.HttpMethod.ToUpper();
             var path = req.RawUrl.Split('?')[0].ToRoute();
             var repo = findRepo(method);
+
             var routelist = new List<Route>();
 
             foreach (var str in new string[] { AllPath, path })
-            {
                 routelist.AddRange(repo.Where(r => r.Path == str));
-            }
-
-
-            var matchingRoutes = routelist.OrderBy(r => r.SortIndex).ToList();
-
-            matchingRoutes.ForEach(r => r.Handler(req, res));
-
-            if (!matchingRoutes.Any())
-                res.StatusCode = 404;
 
             path = null;
             method = null;
-        }
 
-        #endregion
+            return routelist;
+        }
 
     }
 
@@ -143,9 +127,9 @@ namespace Debouncehouse.ExpressNET
         
         public Action<HttpListenerRequest, HttpListenerResponse> Handler { get; private set; }
 
-        public DateTime SortIndex { get; private set; }
+        public ushort SortIndex { get; private set; }
 
-        public Route(string path, Action<HttpListenerRequest, HttpListenerResponse> handler)
+        public Route(string path, Action<HttpListenerRequest, HttpListenerResponse> handler, ushort sortindex = 0)
         {
             if (path == null || path.Length < 2)
                 throw new ArgumentNullException("path");
@@ -155,8 +139,9 @@ namespace Debouncehouse.ExpressNET
 
             Path = path;
             Handler = handler;
-            SortIndex = DateTime.Now;
+            SortIndex = sortindex;
         }
 
     }
+    
 }

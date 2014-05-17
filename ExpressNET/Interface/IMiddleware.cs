@@ -9,7 +9,7 @@ namespace Debouncehouse.ExpressNET
 
     public interface IMiddleware
     {
-        void Process(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse res);
+        bool Process(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse res);
     }
 
 }
