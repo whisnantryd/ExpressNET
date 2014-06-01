@@ -22,7 +22,7 @@ namespace Debouncehouse.ExpressNET
             }
         }
 
-        private List<RouteRepository> Repos { get; set; }
+        private List<RouteRepository> repos { get; set; }
 
         public Router()
         {
@@ -37,27 +37,27 @@ namespace Debouncehouse.ExpressNET
         private void init(string basepath)
         {
             BasePath = basepath.ToRoute();
-            Repos = new List<RouteRepository>();
+            repos = new List<RouteRepository>();
         }
 
         private RouteRepository findRepo(string method)
         {
-            var repo = Repos.Find(r => r.Method == method);
+            var repo = repos.Find(r => r.Method == method);
 
             if (repo == null)
-                Repos.Add(repo = new RouteRepository(method));
+                repos.Add(repo = new RouteRepository(method));
 
             return repo;
         }
 
-        public Router GET(string path, Action<HttpListenerRequest, HttpListenerResponse> handler)
+        public Router GET(string path, RequestHandler handler)
         {
             findRepo(METHOD_GET).Add(new Route(BasePath + path.ToRoute(), handler));
 
             return this;
         }
 
-        public Router POST(string path, Action<HttpListenerRequest, HttpListenerResponse> handler)
+        public Router POST(string path, RequestHandler handler)
         {
             findRepo(METHOD_POST).Add(new Route(BasePath + path.ToRoute(), handler));
 
@@ -66,17 +66,15 @@ namespace Debouncehouse.ExpressNET
 
         public List<Route> FindRoutes(HttpListenerRequest req)
         {
-            var method = req.HttpMethod.ToUpper();
             var path = req.RawUrl.Split('?')[0].ToRoute();
-            var repo = findRepo(method);
+            var repo = findRepo(req.HttpMethod.ToUpper());
 
             var routelist = new List<Route>();
 
             foreach (var str in new string[] { AllPath, path })
-                routelist.AddRange(repo.Where(r => r.Path == str));
+                routelist.AddRange(repo.Where(r => r.Path == str).ToList());
 
             path = null;
-            method = null;
 
             return routelist;
         }
@@ -125,11 +123,11 @@ namespace Debouncehouse.ExpressNET
     {
         public string Path { get; private set; }
         
-        public Action<HttpListenerRequest, HttpListenerResponse> Handler { get; private set; }
+        public RequestHandler Handler { get; private set; }
 
         public ushort SortIndex { get; private set; }
 
-        public Route(string path, Action<HttpListenerRequest, HttpListenerResponse> handler, ushort sortindex = 0)
+        public Route(string path, RequestHandler handler, ushort sortindex = 0)
         {
             if (path == null || path.Length < 2)
                 throw new ArgumentNullException("path");

@@ -14,6 +14,8 @@ namespace Debouncehouse.ExpressNET
 
         private List<Router> routers { get; set; }
 
+        private Dictionary<int, RequestHandler> statushandlers { get; set; }
+
         public Express()
         {
             init();
@@ -35,14 +37,21 @@ namespace Debouncehouse.ExpressNET
 
             srv.BeginGetContext(getContextCallback, srv);
 
+            notifyHandlers(ctx);
+        }
+
+        private void notifyHandlers(HttpListenerContext ctx)
+        {
             var req = ctx.Request;
             var res = ctx.Response;
 
-            var matchingRouters = routers.Where(r => req.RawUrl.ToUpper().StartsWith(r.BasePath)).ToList();
+            var requestRoute = req.RawUrl.ToRoute();
+
+            var matchRouters = routers.Where(r => requestRoute.StartsWith(r.BasePath)).ToList();
 
             var routelist = new List<Route>();
 
-            foreach (Router rtr in matchingRouters)
+            foreach (Router rtr in matchRouters)
                 routelist.AddRange(rtr.FindRoutes(req));
 
             foreach (Route r in routelist.OrderBy(rt => rt.SortIndex).ToList())
@@ -50,8 +59,13 @@ namespace Debouncehouse.ExpressNET
 
             if (!routelist.Any())
             {
-                res.StatusCode = 404;
-                res.Send("<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested service was not found on this server</p></body></html>");
+                if (statushandlers.ContainsKey(404))
+                    statushandlers[404](req, res);
+                else
+                {
+                    res.StatusCode = 404;
+                    res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Invalid request</p></body></html>");
+                }
             }
 
             res.Close();
@@ -69,7 +83,20 @@ namespace Debouncehouse.ExpressNET
             return repo;
         }
 
-        public void Listen(string baseurl)
+        public Express Status(int statuscode, RequestHandler handler)
+        {
+            if (statushandlers == null)
+                statushandlers = new Dictionary<int, RequestHandler>();
+
+            if (statushandlers.ContainsKey(statuscode))
+                statushandlers[statuscode] = handler;
+            else
+                statushandlers.Add(statuscode, handler);
+
+            return this;
+        }
+
+        public Express Listen(string baseurl)
         {
             if (server == null)
             {
@@ -79,6 +106,8 @@ namespace Debouncehouse.ExpressNET
                 server.Start();
                 server.BeginGetContext(getContextCallback, server);
             }
+
+            return this;
         }
 
     }
