@@ -10,25 +10,25 @@ namespace TEST
         {
             var app = new Express();
 
-            var baseRoute = app.Route("clock");
+            var baseRoute = app.Route("");
 
-            baseRoute.GET("tod", (req, res) =>
+            baseRoute.GET("all", (req, res) =>
             {
-                var s = req.QueryString["test"];
+                var s = req.Request.QueryString["test"];
 
                 Console.WriteLine(s);
 
-                res.StatusCode = 200;
-                res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
+                res.Response.StatusCode = 200;
+                res.Response.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
             });
 
             app.Status(404, (req, res) =>
             {
-                res.StatusCode = 404;
-                res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Stupid head</p></body></html>");
+                res.Response.StatusCode = 404;
+                res.Response.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Stupid head</p></body></html>");
             });
 
-            app.Listen("http://*:56000/");
+            app.Listen("http://*/tracktemp");
 
             while (true) { }
         }

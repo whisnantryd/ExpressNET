@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Debouncehouse.ExpressNET.Models;
 
 namespace Debouncehouse.ExpressNET
 {
@@ -12,7 +13,18 @@ namespace Debouncehouse.ExpressNET
         const string METHOD_GET = "GET";
         const string METHOD_POST = "POST";
 
-        public string BasePath { get; private set; }
+        private string basePath;
+        public string BasePath
+        {
+            get
+            {
+                return basePath == "/" ? "" : basePath;
+            }
+            private set
+            {
+                basePath = value;
+            }
+        }
 
         public string AllPath
         {
@@ -64,17 +76,15 @@ namespace Debouncehouse.ExpressNET
             return this;
         }
 
-        public List<Route> FindRoutes(HttpListenerRequest req)
+        public List<Route> FindRoutes(HttpRequestWrapper req)
         {
-            var path = req.RawUrl.Split('?')[0].ToRoute();
-            var repo = findRepo(req.HttpMethod.ToUpper());
+            //var path = req.RawUrl.Split('?')[0].ToRoute();
+            var repo = findRepo(req.RequestMethod);
 
             var routelist = new List<Route>();
 
-            foreach (var str in new string[] { AllPath, path })
+            foreach (var str in new string[] { AllPath, req.RequestPath })
                 routelist.AddRange(repo.Where(r => r.Path == str).ToList());
-
-            path = null;
 
             return routelist;
         }

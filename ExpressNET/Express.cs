@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Debouncehouse.ExpressNET.Models;
 
 namespace Debouncehouse.ExpressNET
 {
     public class Express
     {
+
+        private string abspath { get; set; }
 
         private HttpListener server { get; set; }
 
@@ -49,16 +53,13 @@ namespace Debouncehouse.ExpressNET
 
         private void notifyHandlers(HttpListenerContext ctx)
         {
-            // get the reuqest and response objects associated to this http request context
-            var req = ctx.Request;
-            var res = ctx.Response;
-
-            // convert the request url to standard route format
-            var requestRoute = req.RawUrl.ToRoute();
+            // get the request and response objects associated with this context
+            var req = new HttpRequestWrapper(ctx.Request, abspath);
+            var res = new HttpResponseWrapper(ctx.Response);
 
             try
             {
-                var matchRouters = routers.Where(r => requestRoute.StartsWith(r.BasePath)).ToList();
+                var matchRouters = routers.Where(r => req.RequestPath.StartsWith(r.BasePath)).ToList();
 
                 var routelist = new List<Route>();
 
@@ -73,28 +74,28 @@ namespace Debouncehouse.ExpressNET
                 // no route handlers for this request? respond with 404
                 if (!routelist.Any())
                 {
-                    if (statushandlers.ContainsKey(404))
+                    if (statushandlers != null && statushandlers.ContainsKey(404))
                         statushandlers[404](req, res);
                     else
                     {
-                        res.StatusCode = 404;
-                        res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Invalid request</p></body></html>");
+                        res.Response.StatusCode = 404;
+                        res.Response.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Invalid request</p></body></html>");
                     }
                 }
             }
             catch (Exception ex)
             {
                 // on error respond with 500 - internal server error
-                if (statushandlers.ContainsKey(500))
+                if (statushandlers != null && statushandlers.ContainsKey(500))
                     statushandlers[500](req, res);
                 else
                 {
-                    res.StatusCode = 500;
-                    res.Send("<html><head><title>Ooops</title></head><body><h1>500</h1><p>Internal server error</p></body></html>");
+                    res.Response.StatusCode = 500;
+                    res.Response.Send("<html><head><title>Ooops</title></head><body><h1>500</h1><p>Internal server error</p></body></html>");
                 }
             }
 
-            res.Close();
+            res.Response.Close();
         }
 
         /// <summary>
@@ -149,9 +150,13 @@ namespace Debouncehouse.ExpressNET
         {
             if (server == null)
             {
+                // get the absolute path from the url ( http://*:8080/MyWebApi/V1 -> /MyWebApi/V1 )
+                var apath = baseurl.Replace("http://", "");
+                abspath = apath.Remove(0, apath.IndexOf('/'));
+
                 server = new HttpListener();
 
-                server.Prefixes.Add(baseurl);
+                server.Prefixes.Add(baseurl.TrimEnd('/') + "/");
                 server.Start();
                 server.BeginGetContext(getContextCallback, server);
             }
