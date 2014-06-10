@@ -79,7 +79,7 @@ namespace Debouncehouse.ExpressNET
                     else
                     {
                         res.Response.StatusCode = 404;
-                        res.Response.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Invalid request</p></body></html>");
+                        res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Invalid request</p></body></html>");
                     }
                 }
             }
@@ -91,7 +91,7 @@ namespace Debouncehouse.ExpressNET
                 else
                 {
                     res.Response.StatusCode = 500;
-                    res.Response.Send("<html><head><title>Ooops</title></head><body><h1>500</h1><p>Internal server error</p></body></html>");
+                    res.Send("<html><head><title>Ooops</title></head><body><h1>500</h1><p>Internal server error</p></body></html>");
                 }
             }
 

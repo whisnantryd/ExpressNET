@@ -17,14 +17,5 @@ namespace Debouncehouse.ExpressNET
             return obj;
         }
 
-        public static HttpListenerResponse Send(this HttpListenerResponse res, string msg)
-        {
-            var buff = Encoding.Default.GetBytes(msg);
-
-            res.OutputStream.Write(buff, 0, buff.Length);
-
-            return res;
-        }
-
     }
 }

@@ -19,13 +19,13 @@ namespace TEST
                 Console.WriteLine(s);
 
                 res.Response.StatusCode = 200;
-                res.Response.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
+                res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
             });
 
             app.Status(404, (req, res) =>
             {
                 res.Response.StatusCode = 404;
-                res.Response.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Stupid head</p></body></html>");
+                res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Stupid head</p></body></html>");
             });
 
             app.Listen("http://*/tracktemp");

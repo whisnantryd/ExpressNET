@@ -57,6 +57,19 @@ namespace Debouncehouse.ExpressNET.Models
             Response = res;
         }
 
+        public HttpResponseWrapper Send(string msg)
+        {
+            var buff = Encoding.Default.GetBytes(msg);
+
+            if (Response.OutputStream.CanWrite)
+            {
+                Response.OutputStream.Write(buff, 0, buff.Length);
+                return this;
+            }
+
+            throw new InvalidOperationException("write to output stream");
+        }
+
     }
 
 }
