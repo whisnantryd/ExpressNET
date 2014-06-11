@@ -74,10 +74,12 @@ namespace Debouncehouse.ExpressNET
                 // no route handlers for this request? respond with 404
                 if (!routelist.Any())
                 {
+                    // call the user specified handler for status 404 if set
                     if (statushandlers != null && statushandlers.ContainsKey(404))
                         statushandlers[404](req, res);
                     else
                     {
+                        // respond with a default 404
                         res.Response.StatusCode = 404;
                         res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Invalid request</p></body></html>");
                     }
@@ -86,16 +88,19 @@ namespace Debouncehouse.ExpressNET
             catch (Exception ex)
             {
                 // on error respond with 500 - internal server error
+                // call the user specified handler for status 500 if set
                 if (statushandlers != null && statushandlers.ContainsKey(500))
                     statushandlers[500](req, res);
                 else
                 {
+                    // respond with a default 500
                     res.Response.StatusCode = 500;
                     res.Send("<html><head><title>Ooops</title></head><body><h1>500</h1><p>Internal server error</p></body></html>");
                 }
             }
 
-            res.Response.Close();
+            if(!res.IsClosed)
+                res.Response.Close();
         }
 
         /// <summary>

@@ -46,6 +46,8 @@ namespace Debouncehouse.ExpressNET.Models
     public class HttpResponseWrapper
     {
 
+        public bool IsClosed { get; private set; }
+
         public HttpListenerResponse Response
         {
             get;
@@ -59,6 +61,9 @@ namespace Debouncehouse.ExpressNET.Models
 
         public HttpResponseWrapper Send(string msg)
         {
+            if (IsClosed)
+                throw new InvalidOperationException("attempt to send on closed response");
+
             var buff = Encoding.Default.GetBytes(msg);
 
             if (Response.OutputStream.CanWrite)
@@ -68,6 +73,20 @@ namespace Debouncehouse.ExpressNET.Models
             }
 
             throw new InvalidOperationException("write to output stream");
+        }
+
+        public HttpResponseWrapper SendThenClose(string msg)
+        {
+            if (IsClosed)
+                throw new InvalidOperationException("attempt to send on closed response");
+
+            Send(msg);
+
+            Response.Close();
+
+            IsClosed = true;
+
+            return this;
         }
 
     }
