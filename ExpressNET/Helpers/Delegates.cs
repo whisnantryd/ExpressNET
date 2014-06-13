@@ -1,8 +1,8 @@
-﻿using System.Net;
+﻿using Debouncehouse.ExpressNET.Models;
 
 namespace Debouncehouse.ExpressNET
 {
 
-    public delegate void RequestHandler(Models.HttpRequestWrapper obj1, Models.HttpResponseWrapper obj2);
+    public delegate void RequestHandler(HttpRequestWrapper obj1, HttpResponseWrapper obj2);
 
 }

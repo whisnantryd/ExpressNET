@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Debouncehouse.ExpressNET.Models;
 
 namespace Debouncehouse.ExpressNET
 {
 
     public interface IMiddleware
     {
-        bool Process(System.Net.HttpListenerRequest req, System.Net.HttpListenerResponse res);
+        bool Process(HttpRequestWrapper req, HttpResponseWrapper res);
     }
 
 }
