@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Debouncehouse.ExpressNET;
+using Debouncehouse.ExpressNET.Models;
 
 namespace TEST
 {
@@ -31,6 +32,16 @@ namespace TEST
             app.Listen("http://*/tracktemp");
 
             while (true) { }
+        }
+
+        static void app_Admin(HttpRequestWrapper req, HttpResponseWrapper res)
+        {
+            res.Send("<h1>Admin</h1>");
+        }
+
+        static void app_Client(HttpRequestWrapper req, HttpResponseWrapper res)
+        {
+            res.Send("<h1>Client</h1>");
         }
 
     }

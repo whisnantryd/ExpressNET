@@ -18,7 +18,12 @@ namespace Debouncehouse.ExpressNET.Models
         {
             get
             {
-                return Request.RawUrl.Replace(basePath, "").Split('?')[0].ToRoute();
+                var ret = Request.RawUrl.Split('?')[0].ToRoute();
+
+                if (basePath != "/")
+                    ret = Request.RawUrl.Replace(basePath, "").Split('?')[0].ToRoute();
+                
+                return ret;
             }
         }
 
