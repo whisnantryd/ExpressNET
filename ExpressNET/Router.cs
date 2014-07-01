@@ -77,7 +77,6 @@ namespace Debouncehouse.ExpressNET
 
         public List<Route> FindRoutes(HttpRequestWrapper req)
         {
-            //var path = req.RawUrl.Split('?')[0].ToRoute();
             var repo = findRepo(req.RequestMethod);
 
             var routelist = new List<Route>();
