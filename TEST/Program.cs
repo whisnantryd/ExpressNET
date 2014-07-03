@@ -23,11 +23,9 @@ namespace TEST
                 res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
             });
 
-            app.Status(404, (req, res) =>
-            {
-                res.Response.StatusCode = 404;
-                res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Stupid head</p></body></html>");
-            });
+            var dt = new System.IO.DirectoryInfo(@"C:\");
+
+            baseRoute.Use(new StaticFileProvider(dt));
 
             app.Listen("http://*/tracktemp");
 

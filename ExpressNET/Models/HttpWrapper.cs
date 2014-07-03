@@ -40,7 +40,7 @@ namespace Debouncehouse.ExpressNET.Models
         public HttpRequestWrapper(HttpListenerRequest request, string basepath)
         {
             this.Request = request;
-            this.basePath = basepath;
+            this.basePath = basepath.ToRoute();
         }
 
     }
@@ -49,6 +49,8 @@ namespace Debouncehouse.ExpressNET.Models
     {
 
         public bool IsClosed { get; private set; }
+
+        public bool IsHandled { get; private set; }
 
         public HttpListenerResponse Response
         {
@@ -71,6 +73,9 @@ namespace Debouncehouse.ExpressNET.Models
             if (Response.OutputStream.CanWrite)
             {
                 Response.OutputStream.Write(buff, 0, buff.Length);
+
+                IsHandled = true;
+
                 return this;
             }
 
@@ -85,6 +90,8 @@ namespace Debouncehouse.ExpressNET.Models
             Send(msg);
 
             Response.Close();
+
+            IsHandled = true;
 
             IsClosed = true;
 

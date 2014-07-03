@@ -1,26 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Debouncehouse.ExpressNET.Models
 {
     public class StaticFileProvider : IMiddleware
     {
 
+        private DirectoryInfo baseDirectory;
+
+        public StaticFileProvider(string directory)
+            : this(new DirectoryInfo(directory))
+        {
+        }
+
         public StaticFileProvider(DirectoryInfo directory)
         {
-            if (!directory.Exists)
-                directory.Create();
+            if (!directory.Exists) { directory.Create(); }
+
+            baseDirectory = directory;
         }
 
         #region IMiddleware Members
 
         public bool Process(HttpRequestWrapper req, HttpResponseWrapper res)
         {
-            throw new NotImplementedException();
+            var path = Path.Combine(baseDirectory.FullName, req.RequestPath);
+
+            if (File.Exists(path))
+            {
+                res.SendThenClose(File.ReadAllText(path));
+
+                return true;
+            }
+            else
+                res.Response.StatusCode = 404;
+
+            return false;
         }
 
         #endregion

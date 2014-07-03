@@ -13,6 +13,7 @@ namespace Debouncehouse.ExpressNET
         const string METHOD_POST = "POST";
 
         private string basePath;
+
         public string BasePath
         {
             get
@@ -33,21 +34,20 @@ namespace Debouncehouse.ExpressNET
             }
         }
 
-        private List<RouteRepository> repos { get; set; }
+        private RouteRepository wares;
+
+        private List<RouteRepository> repos;
 
         public Router()
+            : this("")
         {
-            init("");
         }
 
         public Router(string basepath)
         {
-            init(basepath);
-        }
-
-        private void init(string basepath)
-        {
             BasePath = basepath.ToRoute();
+
+            wares = new RouteRepository();
             repos = new List<RouteRepository>();
         }
 
@@ -59,6 +59,13 @@ namespace Debouncehouse.ExpressNET
                 repos.Add(repo = new RouteRepository(method));
 
             return repo;
+        }
+
+        public Router Use(IMiddleware middleware)
+        {
+            wares.Add(new Route((req, res) => { middleware.Process(req, res); }));
+
+            return this;
         }
 
         public Router GET(string path, RequestHandler handler)
@@ -81,6 +88,9 @@ namespace Debouncehouse.ExpressNET
 
             var routelist = new List<Route>();
 
+            if(wares.Any())
+                routelist.AddRange(wares);
+
             foreach (var str in new string[] { AllPath, req.RequestPath })
                 routelist.AddRange(repo.Where(r => r.Path == str).ToList());
 
@@ -95,6 +105,11 @@ namespace Debouncehouse.ExpressNET
         public string Method { get; private set; }
 
         private List<Route> routes { get; set; }
+
+        public RouteRepository()
+            : this("")
+        {
+        }
 
         public RouteRepository(string method)
         {
@@ -134,6 +149,11 @@ namespace Debouncehouse.ExpressNET
         public RequestHandler Handler { get; private set; }
 
         public ushort SortIndex { get; private set; }
+
+        public Route(RequestHandler handler)
+        {
+            Handler = handler;
+        }
 
         public Route(string path, RequestHandler handler, ushort sortindex = 0)
         {

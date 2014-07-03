@@ -69,7 +69,7 @@ namespace Debouncehouse.ExpressNET
                     r.Handler(req, res);
 
                 // no route handlers for this request? respond with 404
-                if (!routelist.Any())
+                if (!res.IsHandled)
                 {
                     // call the user specified handler for status 404 if set
                     if (statushandlers != null && statushandlers.ContainsKey(404))
