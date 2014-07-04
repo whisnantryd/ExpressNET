@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Debouncehouse.ExpressNET.Helpers;
 using Debouncehouse.ExpressNET.Models;
 
 namespace Debouncehouse.ExpressNET
 {
+
     public class Express
     {
 
@@ -167,4 +169,5 @@ namespace Debouncehouse.ExpressNET
         }
 
     }
+
 }

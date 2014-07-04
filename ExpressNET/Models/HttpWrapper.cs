@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Text;
+using Debouncehouse.ExpressNET.Helpers;
 
 namespace Debouncehouse.ExpressNET.Models
 {

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Debouncehouse.ExpressNET.Helpers;
 using Debouncehouse.ExpressNET.Models;
 
 namespace Debouncehouse.ExpressNET
@@ -144,6 +145,12 @@ namespace Debouncehouse.ExpressNET
 
     public class Route
     {
+        private static ushort sort_index = 0;
+        private static ushort get_sort_index()
+        {
+            return ++sort_index;
+        }
+
         public string Path { get; private set; }
         
         public RequestHandler Handler { get; private set; }
@@ -155,7 +162,7 @@ namespace Debouncehouse.ExpressNET
             Handler = handler;
         }
 
-        public Route(string path, RequestHandler handler, ushort sortindex = 0)
+        public Route(string path, RequestHandler handler)
         {
             if (path == null || path.Length < 2)
                 throw new ArgumentNullException("path");
@@ -165,7 +172,7 @@ namespace Debouncehouse.ExpressNET
 
             Path = path;
             Handler = handler;
-            SortIndex = sortindex;
+            SortIndex = get_sort_index();
         }
 
     }

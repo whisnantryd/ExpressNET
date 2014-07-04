@@ -1,5 +1,5 @@
 ﻿
-namespace Debouncehouse.ExpressNET
+namespace Debouncehouse.ExpressNET.Helpers
 {
     public static class Extensions
     {
