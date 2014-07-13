@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Text;
+using Debouncehouse.ExpressNET.Enums;
 using Debouncehouse.ExpressNET.Helpers;
 
 namespace Debouncehouse.ExpressNET.Models
@@ -28,13 +29,7 @@ namespace Debouncehouse.ExpressNET.Models
             }
         }
 
-        public string RequestMethod
-        {
-            get
-            {
-                return Request.HttpMethod.ToUpper();
-            }
-        }
+        public HttpMethodType RequestMethod { get; private set; }
 
         private string basePath;
 
@@ -42,6 +37,8 @@ namespace Debouncehouse.ExpressNET.Models
         {
             this.Request = request;
             this.basePath = basepath.ToRoute();
+
+            RequestMethod = (HttpMethodType)Enum.Parse(typeof(HttpMethodType), Request.HttpMethod.ToUpper());
         }
 
     }

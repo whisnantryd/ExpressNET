@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Debouncehouse.ExpressNET.Enums;
 using Debouncehouse.ExpressNET.Helpers;
 using Debouncehouse.ExpressNET.Models;
 
@@ -52,12 +53,12 @@ namespace Debouncehouse.ExpressNET
             repos = new List<RouteRepository>();
         }
 
-        private RouteRepository findRepo(string method)
+        private RouteRepository findRepo(HttpMethodType methodtype)
         {
-            var repo = repos.Find(r => r.Method == method);
+            var repo = repos.Find(r => r.Method == methodtype);
 
             if (repo == null)
-                repos.Add(repo = new RouteRepository(method));
+                repos.Add(repo = new RouteRepository(methodtype));
 
             return repo;
         }
@@ -69,16 +70,31 @@ namespace Debouncehouse.ExpressNET
             return this;
         }
 
+        public Action<string, RequestHandler> this[HttpMethodType methodtype]
+        {
+            get
+            {
+                var repo = findRepo(methodtype);
+
+                return new Action<string, RequestHandler>((path, handler) =>
+                {
+                    repo.Add(new Route(BasePath + path.ToRoute(), handler));
+                });
+            }
+        }
+
+        [Obsolete()]
         public Router GET(string path, RequestHandler handler)
         {
-            findRepo(METHOD_GET).Add(new Route(BasePath + path.ToRoute(), handler));
+            findRepo(HttpMethodType.GET).Add(new Route(BasePath + path.ToRoute(), handler));
 
             return this;
         }
 
+        [Obsolete()]
         public Router POST(string path, RequestHandler handler)
         {
-            findRepo(METHOD_POST).Add(new Route(BasePath + path.ToRoute(), handler));
+            findRepo(HttpMethodType.POST).Add(new Route(BasePath + path.ToRoute(), handler));
 
             return this;
         }
@@ -103,16 +119,16 @@ namespace Debouncehouse.ExpressNET
     public class RouteRepository : IEnumerable<Route>
     {
 
-        public string Method { get; private set; }
+        public HttpMethodType Method { get; private set; }
 
         private List<Route> routes { get; set; }
 
         public RouteRepository()
-            : this("")
+            : this(HttpMethodType.GET)
         {
         }
 
-        public RouteRepository(string method)
+        public RouteRepository(HttpMethodType method)
         {
             Method = method;
             routes = new List<Route>();

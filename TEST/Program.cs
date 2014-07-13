@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Debouncehouse.ExpressNET;
+using Debouncehouse.ExpressNET.Enums;
 using Debouncehouse.ExpressNET.Models;
 
 namespace TEST
@@ -13,7 +14,17 @@ namespace TEST
 
             var baseRoute = app.Route("");
 
-            baseRoute.GET("all", (req, res) =>
+            //baseRoute.GET("all", (req, res) =>
+            //{
+            //    var s = req.Request.QueryString["test"];
+
+            //    Console.WriteLine(s);
+
+            //    res.Response.StatusCode = 200;
+            //    res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
+            //});
+
+            baseRoute[HttpMethodType.GET]("newall", (req, res) =>
             {
                 var s = req.Request.QueryString["test"];
 

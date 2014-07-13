@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\HttpMethodType.cs" />
     <Compile Include="Helpers\Delegates.cs" />
     <Compile Include="Express.cs" />
     <Compile Include="Helpers\Extensions.cs" />
