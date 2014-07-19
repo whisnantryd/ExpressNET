@@ -20,4 +20,4 @@ Example usage -
 
 Access this route from your browser -
 
-    http://localhost/hello/world
+    http://localhost/myserver/hello/world
