@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using Debouncehouse.ExpressNET.Helpers;
 using Debouncehouse.ExpressNET.Models;
+using Debouncehouse.ExpressNET.Routes;
 
 namespace Debouncehouse.ExpressNET
 {
@@ -11,23 +12,18 @@ namespace Debouncehouse.ExpressNET
     public class Express
     {
 
-        private string abspath { get; set; }
+        private string abspath;
 
-        private HttpListener server { get; set; }
+        private HttpListener server;
 
-        private List<Router> routers { get; set; }
+        private List<Router> routers;
 
-        private Dictionary<int, RequestHandler> statushandlers { get; set; }
+        private Dictionary<int, RequestHandler> statushandlers;
 
         /// <summary>
         /// Initailizer
         /// </summary>
         public Express()
-        {
-            init();
-        }
-
-        private void init()
         {
             routers = new List<Router>();
         }
@@ -107,7 +103,9 @@ namespace Debouncehouse.ExpressNET
         /// </summary>
         public Router Route(string path = "")
         {
-            // convert the path to standard path format ('/somerequest')
+            // convert the path to standard path format, all uppercase
+            // ('somerequest/somepath/:parameter' -> '/REQUEST/PATH/:PARAMETER')
+            // note that any parameter key will be converted to uppercase and these keys are case sensitive
             path = path.ToRoute();
 
             // retrieve an existing router matching the specified path

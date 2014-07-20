@@ -14,5 +14,19 @@ namespace Debouncehouse.ExpressNET.Helpers
             return obj;
         }
 
+        public static bool PathMatch(this string[] obj, string[] other)
+        {
+            if (obj.Length != other.Length)
+                return false;
+
+            var match = true;
+
+            for (int i = 0; i < obj.Length; i++)
+                if (!(obj[i] == other[i] || (obj[i].StartsWith(":") || other[i].StartsWith(":"))))
+                    match = false;
+
+            return match;
+        }
+
     }
 }

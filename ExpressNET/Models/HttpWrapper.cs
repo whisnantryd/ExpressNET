@@ -10,11 +10,9 @@ namespace Debouncehouse.ExpressNET.Models
     public class HttpRequestWrapper
     {
 
-        public HttpListenerRequest Request
-        {
-            get;
-            private set;
-        }
+        public HttpListenerRequest Request { get; private set; }
+
+        public HTTP RequestMethod { get; private set; }
 
         public string RequestPath
         {
@@ -24,12 +22,14 @@ namespace Debouncehouse.ExpressNET.Models
 
                 if (basePath != "/")
                     ret = ret.Replace(basePath, "");
-                
+
                 return ret;
             }
         }
 
-        public HttpMethodType RequestMethod { get; private set; }
+        public DynamicDictionary<string, string> Parameters = new DynamicDictionary<string, string>();
+
+        public string[] Parts { get; private set; }
 
         private string basePath;
 
@@ -37,8 +37,9 @@ namespace Debouncehouse.ExpressNET.Models
         {
             this.Request = request;
             this.basePath = basepath.ToRoute();
+            this.Parts = RequestPath.Split('/');
 
-            RequestMethod = (HttpMethodType)Enum.Parse(typeof(HttpMethodType), Request.HttpMethod.ToUpper());
+            RequestMethod = (HTTP)Enum.Parse(typeof(HTTP), Request.HttpMethod.ToUpper());
         }
 
     }

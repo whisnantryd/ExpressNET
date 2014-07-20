@@ -14,43 +14,18 @@ namespace TEST
 
             var baseRoute = app.Route("");
 
-            //baseRoute.GET("all", (req, res) =>
-            //{
-            //    var s = req.Request.QueryString["test"];
-
-            //    Console.WriteLine(s);
-
-            //    res.Response.StatusCode = 200;
-            //    res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
-            //});
-
-            baseRoute[HttpMethodType.GET]("newall", (req, res) =>
+            baseRoute[HTTP.GET]("member/:id/name", (req, res) =>
             {
-                var s = req.Request.QueryString["test"];
-
-                Console.WriteLine(s);
+                // parameter keys are converted to upper case
+                var id = req.Parameters["ID"];
 
                 res.Response.StatusCode = 200;
-                res.Send(System.DateTime.Now.ToString("hh\\:mm\\:ss") + " - " + s);
+                res.SendThenClose("Receieved request for member with id " + id);
             });
 
-            var dt = new System.IO.DirectoryInfo(@"C:\");
-
-            baseRoute.Use(new StaticFileProvider(dt));
-
-            app.Listen("http://*/tracktemp");
+            app.Listen("http://*/membership/");
 
             while (true) { }
-        }
-
-        static void app_Admin(HttpRequestWrapper req, HttpResponseWrapper res)
-        {
-            res.Send("<h1>Admin</h1>");
-        }
-
-        static void app_Client(HttpRequestWrapper req, HttpResponseWrapper res)
-        {
-            res.Send("<h1>Client</h1>");
         }
 
     }

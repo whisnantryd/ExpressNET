@@ -39,15 +39,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\HttpMethodType.cs" />
+    <Compile Include="Enums\HTTP.cs" />
     <Compile Include="Helpers\Delegates.cs" />
     <Compile Include="Express.cs" />
+    <Compile Include="Helpers\DynamicDictionary.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Interface\IMiddleware.cs" />
     <Compile Include="Models\HttpWrapper.cs" />
     <Compile Include="Models\StaticFileProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Router.cs" />
+    <Compile Include="Routes\Route.cs" />
+    <Compile Include="Routes\RouteParameter.cs" />
+    <Compile Include="Routes\Router.cs" />
+    <Compile Include="Routes\RouteRepository.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

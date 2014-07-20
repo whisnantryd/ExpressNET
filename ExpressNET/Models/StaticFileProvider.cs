@@ -23,7 +23,7 @@ namespace Debouncehouse.ExpressNET.Models
 
         public bool Process(HttpRequestWrapper req, HttpResponseWrapper res)
         {
-            var path = Path.Combine(baseDirectory.FullName, req.RequestPath);
+            var path = baseDirectory.FullName + req.RequestPath.Replace("/", @"\");
 
             if (File.Exists(path))
             {
