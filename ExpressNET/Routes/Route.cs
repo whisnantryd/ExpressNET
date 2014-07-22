@@ -10,12 +10,12 @@ namespace Debouncehouse.ExpressNET.Routes
 
         #region static members
 
-        private static ushort sort_index = 0;
+        static ushort sort_index = 0;
 
-        private static ushort getSortIndex()
-        {
-            return ++sort_index;
-        }
+        //static ushort getSortIndex()
+        //{
+        //    return ++sort_index;
+        //}
 
         #endregion
 
@@ -39,6 +39,9 @@ namespace Debouncehouse.ExpressNET.Routes
 
                 handler(req, res);
             });
+
+            SortIndex = ++sort_index;
+            Parameters = parsePathParameters();
         }
 
         public Route(string path, RequestHandler handler)
@@ -52,13 +55,15 @@ namespace Debouncehouse.ExpressNET.Routes
 
             Path = path;
             //Handler = handler;
-            SortIndex = getSortIndex();
-            Parameters = parsePathParameters();
+            //SortIndex = getSortIndex();
         }
 
         private List<RouteParameter> parsePathParameters()
         {
             var newparameters = new List<RouteParameter>();
+
+            if (Path == null)
+                return newparameters;
 
             var parts = Path.Split('/');
 

@@ -27,6 +27,10 @@ namespace Debouncehouse.ExpressNET.Models
 
             if (File.Exists(path))
             {
+                var fileinfo = new FileInfo(path);
+
+                res.Response.StatusCode = 200;
+                res.Response.ContentType = "text/" + fileinfo.Extension.TrimStart('.');
                 res.SendThenClose(File.ReadAllText(path));
 
                 return true;

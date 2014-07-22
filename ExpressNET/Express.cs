@@ -64,10 +64,13 @@ namespace Debouncehouse.ExpressNET
 
                 // invoke each route handler single-threaded, sequentially in the order they were originally added
                 foreach (Route r in routelist.OrderBy(rt => rt.SortIndex).ToList())
-                    r.Handler(req, res);
+                    if (res.IsHandled && res.IsClosed)
+                        break;
+                    else
+                        r.Handler(req, res);
 
                 // no route handlers for this request? respond with 404
-                if (!res.IsHandled)
+                if (!res.IsHandled && !res.IsClosed)
                 {
                     // call the user specified handler for status 404 if set
                     if (statushandlers != null && statushandlers.ContainsKey(404))

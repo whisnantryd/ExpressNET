@@ -20,8 +20,10 @@ namespace TEST
                 var id = req.Parameters["ID"];
 
                 res.Response.StatusCode = 200;
-                res.SendThenClose("Receieved request for member with id " + id);
+                res.SendThenClose("Receieved request for member with id " + id + ", name = nathan");
             });
+
+            baseRoute.Use(new StaticFileProvider(@"C:\"));
 
             app.Listen("http://*/membership/");
 
