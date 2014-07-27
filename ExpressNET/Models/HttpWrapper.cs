@@ -51,11 +51,7 @@ namespace Debouncehouse.ExpressNET.Models
 
         public bool IsHandled { get; private set; }
 
-        public HttpListenerResponse Response
-        {
-            get;
-            private set;
-        }
+        public HttpListenerResponse Response { get; private set; }
 
         public HttpResponseWrapper(HttpListenerResponse res)
         {

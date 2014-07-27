@@ -10,9 +10,7 @@ namespace Debouncehouse.ExpressNET.Routes
 
     public class Router
     {
-        const string METHOD_GET = "GET";
-        const string METHOD_POST = "POST";
-
+        
         private string basePath;
 
         public string BasePath
@@ -82,22 +80,6 @@ namespace Debouncehouse.ExpressNET.Routes
             }
         }
 
-        [Obsolete()]
-        public Router GET(string path, RequestHandler handler)
-        {
-            findRepo(HTTP.GET).Add(new Route(BasePath + path.ToRoute(), handler));
-
-            return this;
-        }
-
-        [Obsolete()]
-        public Router POST(string path, RequestHandler handler)
-        {
-            findRepo(HTTP.POST).Add(new Route(BasePath + path.ToRoute(), handler));
-
-            return this;
-        }
-
         public List<Route> FindRoutes(HttpRequestWrapper req)
         {
             var repo = findRepo(req.RequestMethod);
@@ -109,9 +91,7 @@ namespace Debouncehouse.ExpressNET.Routes
 
             foreach (var str in new string[] { AllPath, req.RequestPath })
             {
-                //routelist.AddRange(repo.Where(r => r.Path == str).ToList());
                 routelist.AddRange(repo.Match(str));
-                
             }
 
             return routelist;
