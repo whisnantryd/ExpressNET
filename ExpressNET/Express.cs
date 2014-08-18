@@ -64,7 +64,7 @@ namespace Debouncehouse.ExpressNET
 
                 // invoke each route handler single-threaded, sequentially in the order they were originally added
                 foreach (Route r in routelist.OrderBy(rt => rt.SortIndex).ToList())
-                    if (res.IsHandled && res.IsClosed)
+                    if (res.IsHandled || res.IsClosed)
                         break;
                     else
                         r.Handler(req, res);

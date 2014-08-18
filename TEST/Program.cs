@@ -14,17 +14,37 @@ namespace TEST
 
             var baseRoute = app.Route("");
 
+            var members = new System.Collections.Generic.Dictionary<int, string>();
+
+            members.Add(92, "Billsky");
+
+            baseRoute[HTTP.GET]("member", (req, res) =>
+            {
+                res.Response.StatusCode = 200;
+                res.SendThenClose("Hey");
+            });
+
             baseRoute[HTTP.GET]("member/:id/name", (req, res) =>
             {
                 // parameter keys are converted to upper case
-                var id = req.Parameters["ID"];
+                var id = int.Parse(req.Parameters["ID"]);
 
-                res.Response.StatusCode = 200;
-                res.SendThenClose("Receieved request for member with id " + id + ", name = nathan");
+                if (members.ContainsKey(id))
+                {
+                    var name = members[id].ToString();
+
+                    res.Response.StatusCode = 200;
+                    res.SendThenClose("Receieved request for member with id " + id + ", name = " + name);
+                }
+                else
+                {
+                    res.Response.StatusCode = 301;
+                    res.SendThenClose("Unable to find information on member #" + id);
+                }
             });
 
             baseRoute.Use(new StaticFileProvider(@"C:\"));
-
+            
             app.Listen("http://*/membership/");
 
             while (true) { }

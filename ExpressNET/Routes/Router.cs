@@ -62,7 +62,10 @@ namespace Debouncehouse.ExpressNET.Routes
 
         public Router Use(IMiddleware middleware)
         {
-            wares.Add(new Route((req, res) => { middleware.Process(req, res); }));
+            wares.Add(new Route((req, res) =>
+            {
+                middleware.Process(req, res);
+            }));
 
             return this;
         }

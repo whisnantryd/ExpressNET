@@ -29,11 +29,9 @@ namespace Debouncehouse.ExpressNET.Routes
 
         public Route(RequestHandler handler)
         {
-            Parameters = new List<RouteParameter>();
-
             Handler = new RequestHandler((req, res) =>
             {
-                if (Parameters.Count > 0)
+                if (Parameters != null && Parameters.Count > 0)
                     foreach (RouteParameter rp in Parameters)
                         req.Parameters[rp.Key.ToUpper()] = req.Parts[rp.Index];
 
@@ -41,7 +39,6 @@ namespace Debouncehouse.ExpressNET.Routes
             });
 
             SortIndex = ++sort_index;
-            Parameters = parsePathParameters();
         }
 
         public Route(string path, RequestHandler handler)
@@ -54,8 +51,7 @@ namespace Debouncehouse.ExpressNET.Routes
                 throw new ArgumentNullException("handler");
 
             Path = path;
-            //Handler = handler;
-            //SortIndex = getSortIndex();
+            Parameters = parsePathParameters();
         }
 
         private List<RouteParameter> parsePathParameters()
