@@ -149,8 +149,8 @@ namespace Debouncehouse.ExpressNET
         /// Instructs the object to begin listening for http requests matching the specified base url (http://www.mywebsite.com/api/v2)
         /// </summary>
         /// <param name="baseurl">The base url that should prepend all requests handled by this object,
-        /// wildcards are permitted according to standard URI spec</param>
-        /// <returns></returns>
+        /// wildcards are permitted according to standard URI spec
+        /// </param>
         public Express Listen(string baseurl)
         {
             if (server == null)
@@ -165,6 +165,22 @@ namespace Debouncehouse.ExpressNET
                 server.Start();
                 server.BeginGetContext(getContextCallback, server);
             }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Stops recieving new requests and closes the listener
+        /// </summary>
+        public Express Close()
+        {
+            if (server == null)
+                return this;
+
+            if(server.IsListening)
+                server.Stop();
+
+            server = null;
 
             return this;
         }

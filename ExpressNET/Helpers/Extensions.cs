@@ -28,5 +28,12 @@ namespace Debouncehouse.ExpressNET.Helpers
             return match;
         }
 
+        public static string ToJSON<T>(this T obj)
+        {
+            var js = new System.Web.Script.Serialization.JavaScriptSerializer();
+
+            return js.Serialize(obj);
+        }
+
     }
 }
