@@ -74,12 +74,23 @@ namespace Debouncehouse.ExpressNET.Routes
         {
             get
             {
-                var repo = findRepo(methodtype);
+                return handlerRepoForMethodType(methodtype);
+            }
+        }
 
-                return new Action<string, RequestHandler>((path, handler) =>
-                {
-                    repo.Add(new Route(BasePath + path.ToRoute(), handler));
-                });
+        public Action<string, RequestHandler> GET
+        {
+            get
+            {
+                return handlerRepoForMethodType(HTTP.GET);
+            }
+        }
+
+        public Action<string, RequestHandler> POST
+        {
+            get
+            {
+                return handlerRepoForMethodType(HTTP.POST);
             }
         }
 
@@ -98,6 +109,16 @@ namespace Debouncehouse.ExpressNET.Routes
             }
 
             return routelist;
+        }
+
+        private Action<string, RequestHandler> handlerRepoForMethodType(HTTP methodtype)
+        {
+            var repo = findRepo(methodtype);
+
+            return new Action<string, RequestHandler>((path, handler) =>
+            {
+                repo.Add(new Route(BasePath + path.ToRoute(), handler));
+            });
         }
 
     }
