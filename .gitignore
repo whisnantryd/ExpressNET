@@ -184,3 +184,6 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+# No idea why this file is here
+sa

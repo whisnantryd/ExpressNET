@@ -61,7 +61,9 @@
     <Compile Include="Routes\RouteParameter.cs" />
     <Compile Include="Routes\Router.cs" />
     <Compile Include="Routes\RouteRepository.cs" />
+    <Compile Include="Server\Socket.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
