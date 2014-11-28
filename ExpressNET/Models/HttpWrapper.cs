@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 using Debouncehouse.ExpressNET.Enums;
@@ -42,6 +43,22 @@ namespace Debouncehouse.ExpressNET.Models
             RequestMethod = (HTTP)Enum.Parse(typeof(HTTP), Request.HttpMethod.ToUpper());
         }
 
+        public bool CanAcceptEncoding(string encoding)
+        {
+            for (int i = 0; i < Request.Headers.Count; i++)
+            {
+                var key = Request.Headers.Keys[i];
+                var value = Request.Headers[key];
+
+                if (key == "Accept-Encoding")
+                {
+                    return value.Contains("gzip");
+                }
+            }
+
+            return false;
+        }
+
     }
 
     public class HttpResponseWrapper
@@ -58,6 +75,23 @@ namespace Debouncehouse.ExpressNET.Models
             Response = res;
         }
 
+        public HttpResponseWrapper(HttpListenerResponse res, Func<string, bool> acceptsencoding)
+        {
+            Response = res;
+
+            if (acceptsencoding == null)
+            {
+                acceptsEncoding = (encoding) =>
+                {
+                    return false;
+                };
+            }
+            else
+            {
+                acceptsEncoding = acceptsencoding;
+            }
+        }
+
         public HttpResponseWrapper Send(string msg)
         {
             if (IsClosed)
@@ -67,7 +101,19 @@ namespace Debouncehouse.ExpressNET.Models
 
             if (Response.OutputStream.CanWrite)
             {
-                Response.OutputStream.Write(buff, 0, buff.Length);
+                if (acceptsEncoding("gzip"))
+                {
+                    Response.AppendHeader("Content-Encoding", "gzip");
+
+                    using (GZipStream zipstream = new GZipStream(Response.OutputStream, CompressionMode.Compress))
+                    {
+                        zipstream.Write(buff, 0, buff.Length);
+                    }
+                }
+                else
+                {
+                    Response.OutputStream.Write(buff, 0, buff.Length);
+                }
 
                 IsHandled = true;
 
@@ -86,13 +132,13 @@ namespace Debouncehouse.ExpressNET.Models
 
             Response.Close();
 
-            IsHandled = true;
-
-            IsClosed = true;
+            IsHandled = IsClosed = true;
 
             return this;
         }
 
+        private Func<string, bool> acceptsEncoding;
+        
     }
 
 }

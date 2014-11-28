@@ -50,7 +50,7 @@ namespace Debouncehouse.ExpressNET
         {
             // get the request and response objects associated with this context
             var req = new HttpRequestWrapper(ctx.Request, abspath);
-            var res = new HttpResponseWrapper(ctx.Response);
+            var res = new HttpResponseWrapper(ctx.Response, req.CanAcceptEncoding);
 
             try
             {
