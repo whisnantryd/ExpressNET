@@ -79,6 +79,7 @@ namespace Debouncehouse.ExpressNET
                     {
                         // respond with a default 404
                         res.Response.StatusCode = 404;
+                        res.Response.ContentType = "text/html";
                         res.Send("<html><head><title>Ooops</title></head><body><h1>404</h1><p>Invalid request</p></body></html>");
                     }
                 }

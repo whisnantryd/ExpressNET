@@ -20,12 +20,13 @@ namespace Debouncehouse.ExpressNET.Server
 
         void Broadcast(byte[] message);
         void OnDataRecieved(EventHandler<SocketEventArgs> handler);
+        void OnClientConnected(EventHandler<SocketEventArgs> handler);
     }
 
     public class SocketHost : ISocketHost, IDisposable
     {
 
-        #region Public Properties
+        #region Public Data
 
         public IPAddress Host { get; private set; }
 
@@ -46,6 +47,8 @@ namespace Debouncehouse.ExpressNET.Server
         BackgroundWorker bgwSend;
 
         EventHandler<SocketEventArgs> dataRecievedHandlers;
+
+        EventHandler<SocketEventArgs> clientConnectedHandlers;
 
         #endregion
 
@@ -81,14 +84,14 @@ namespace Debouncehouse.ExpressNET.Server
             Clients = new List<TcpClient>();
 
             bgwSend = new BackgroundWorker();
-            bgwSend.DoWork += broadcast;
+            bgwSend.DoWork += processSendQueue;
         }
 
         #endregion
 
-        #region Private Methods
+        #region Private Members
 
-        void broadcast(object sender, EventArgs e)
+        void processSendQueue(object sender, EventArgs e)
         {
             while (sendQueue.Count() > 0)
             {
@@ -114,6 +117,8 @@ namespace Debouncehouse.ExpressNET.Server
         {
             Clients.Add(client);
 
+            callClientConnected(new SocketEventArgs(new ClientData(client)));
+
             return Task.Factory.StartNew(() =>
             {
                 try
@@ -126,21 +131,55 @@ namespace Debouncehouse.ExpressNET.Server
 
                         bytesread = client.GetStream().Read(buff, 0, buff.Length);
 
+                        if (bytesread == 0)
+                            break;
+
                         data = Encoding.Default.GetString(buff, 0, bytesread);
 
-                        if (dataRecievedHandlers != null)
-                        {
-                            dataRecievedHandlers.Invoke(this, new SocketEventArgs(new ClientData(client, data)));
-                        }
+                        callDataRecieved(new SocketEventArgs(new ClientData(client, data)));
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + ex.Message);
-
-                    Clients.Remove(client);
                 }
+
+                Clients.Remove(client);
             });
+        }
+
+        void callDataRecieved(SocketEventArgs e)
+        {
+            try
+            {
+                if (dataRecievedHandlers == null)
+                    return;
+
+                dataRecievedHandlers.Invoke(this, e);
+            }
+            catch (Exception) { }
+        }
+
+        void callClientConnected(SocketEventArgs e)
+        {
+            try
+            {
+                if (clientConnectedHandlers == null)
+                    return;
+
+                clientConnectedHandlers.Invoke(this, e);
+            }
+            catch (Exception) { }
+        }
+
+        void internalBroadcast(byte[] message)
+        {
+            sendQueue.Enqueue(message);
+
+            if (bgwSend.IsBusy)
+                return;
+
+            bgwSend.RunWorkerAsync();
         }
 
         #endregion
@@ -208,17 +247,35 @@ namespace Debouncehouse.ExpressNET.Server
 
         public void Broadcast(byte[] message)
         {
-            sendQueue.Enqueue(message);
+            internalBroadcast(message);
+        }
 
-            if (bgwSend.IsBusy)
-                return;
+        public void Broadcast(string message)
+        {
+            if (message.EndsWith("\r\n") == false)
+            {
+                message = message + "\r\n";
+            }
 
-            bgwSend.RunWorkerAsync();
+            var msgbytes = Encoding.Default.GetBytes(message);
+
+            internalBroadcast(msgbytes);
         }
 
         public void OnDataRecieved(EventHandler<SocketEventArgs> handler)
         {
+            if(dataRecievedHandlers != null && dataRecievedHandlers.GetInvocationList().Contains(handler))
+                throw new InvalidOperationException("Invocation list already contains the supplied delegate");
+
             dataRecievedHandlers += handler;
+        }
+
+        public void OnClientConnected(EventHandler<SocketEventArgs> handler)
+        {
+            if (clientConnectedHandlers != null && clientConnectedHandlers.GetInvocationList().Contains(handler))
+                throw new InvalidOperationException("Invocation list already contains the supplied delegate");
+
+            clientConnectedHandlers += handler;
         }
 
         #endregion
@@ -258,15 +315,30 @@ namespace Debouncehouse.ExpressNET.Server
     public class ClientData
     {
 
+        #region Public Data
+
         public TcpClient Client { get; private set; }
 
         public string Data { get; private set; }
+
+        #endregion
+
+        #region Constructor
+
+        public ClientData() : this(null, null) { }
+
+        public ClientData(TcpClient client) : this(client, null) { }
+        
+        public ClientData(string data) : this(null, data) { }
 
         public ClientData(TcpClient client, string data)
         {
             Client = client;
             Data = data;
         }
+
+        #endregion
+
     }
 
 }
