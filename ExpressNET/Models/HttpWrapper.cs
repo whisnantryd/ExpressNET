@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Text;
@@ -133,6 +134,33 @@ namespace Debouncehouse.ExpressNET.Models
             Response.Close();
 
             IsHandled = IsClosed = true;
+
+            return this;
+        }
+
+        public HttpResponseWrapper Send(System.Drawing.Image image)
+        {
+            Response.AddHeader("Content-Type", "image/png");
+            //Response.AddHeader("Content-Length", image.);
+
+            if (acceptsEncoding("gzip"))
+            {
+                Response.AppendHeader("Content-Encoding", "gzip");
+
+                using (GZipStream zipstream = new GZipStream(Response.OutputStream, CompressionMode.Compress))
+                {
+                    image.Save(zipstream, System.Drawing.Imaging.ImageFormat.Png);
+                }
+            }
+            else
+            {
+                image.Save(Response.OutputStream, System.Drawing.Imaging.ImageFormat.Png);
+            }
+            
+            Response.OutputStream.Flush();
+            Response.OutputStream.Close();
+
+            IsHandled = true;
 
             return this;
         }
