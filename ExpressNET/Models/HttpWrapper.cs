@@ -138,6 +138,16 @@ namespace Debouncehouse.ExpressNET.Models
             return this;
         }
 
+        public HttpResponseWrapper SendThenClose(string msg, string contenttype)
+        {
+            if (IsClosed)
+                throw new InvalidOperationException("attempt to send on closed response");
+
+            Response.ContentType = contenttype;
+
+            return SendThenClose(msg);
+        }
+
         public HttpResponseWrapper Send(System.Drawing.Image image)
         {
             Response.AddHeader("Content-Type", "image/png");
