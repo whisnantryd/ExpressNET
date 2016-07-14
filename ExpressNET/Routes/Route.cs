@@ -12,11 +12,6 @@ namespace Debouncehouse.ExpressNET.Routes
 
         static ushort sort_index = 0;
 
-        //static ushort getSortIndex()
-        //{
-        //    return ++sort_index;
-        //}
-
         #endregion
 
         public string Path { get; private set; }
